@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.lines as mlines
 
 """Please change the path"""
-file_path = '/home/ekagra/Desktop/Study/IMECE/visualization/corruption-testing/results/CIFAR10/WideResNet_28_4/Clever vs. PGD-paperversion/config9_standard_eps_0.0_False_run_0_adversarial_distances.csv'
-# file_path = '/home/ekagra/Desktop/Study/IMECE/visualization/corruption-testing/results/CIFAR10/WideResNet_28_4/Clever vs. PGD-paperversion/config2_run_0_adversarial_distances.csv'
+# file_path = '/home/ekagra/Desktop/Study/IMECE/visualization/corruption-testing/results/CIFAR10/WideResNet_28_4/Clever vs. PGD-paperversion/config9_standard_eps_0.0_False_run_0_adversarial_distances.csv'
+file_path = '/home/ekagra/Desktop/Study/IMECE/visualization/corruption-testing/results/CIFAR10/WideResNet_28_4/Clever vs. PGD-paperversion/config2_run_0_adversarial_distances.csv'
 
 data = pd.read_csv(file_path, sep=';', decimal=',')
 
@@ -51,13 +51,13 @@ ax_legend = fig_legend.add_subplot(111)
 ax_legend.legend(handles=legend_elements, loc='center', ncol=4, frameon=False, fontsize=40)
 ax_legend.axis('off')
 
-fig_legend.savefig('/home/ekagra/Desktop/Study/IMECE/visualization/adversarial-distance-estimation/ekagra/legend.pdf', bbox_inches='tight', pad_inches=0.1)
+fig_legend.savefig('/home/ekagra/Desktop/Study/IMECE/visualization/adversarial-distance-estimation/visualizations/legend.pdf', bbox_inches='tight', pad_inches=0.1)
 plt.close(fig_legend)
 
 
 plt.xlabel('Image ID', fontsize=14)
-plt.ylabel('L$_1$ Distance', fontsize=14)
+plt.ylabel('L$_2$ Distance', fontsize=14)
 plt.tight_layout()
-# plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/adv_vs_cl_robust_l{norm}_1024_500.pdf')
-plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/adv_vs_cl_standard_l{norm}_1024_500.pdf')
+plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/adv_vs_cl_robust_l{norm}_1024_500.pdf')
+# plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/adv_vs_cl_standard_l{norm}_1024_500.pdf')
 plt.show()
