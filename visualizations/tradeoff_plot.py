@@ -15,7 +15,7 @@ fig, ax1 = plt.subplots(figsize=(4.69, 3))
 
 # Plot Runtime vs Maximum Iterations with y-axis on the left
 color = 'blue'
-ax1.set_xlabel('Epsilon Step', fontsize=8)
+ax1.set_xlabel('eps_step', fontsize=8)
 ax1.set_ylabel('Mean Adversarial Distance [$L_{\infty}$]', color=color, fontsize=8)
 ax1.plot(eps_iter_list, mean_adv_dist_list, 'o-', color=color)
 ax1.tick_params(axis='both', labelsize=8)
@@ -37,5 +37,5 @@ ax2.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 
 # Use tight layout to fit the subplots to the figure area.
 plt.tight_layout()
-# plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/eps_iter_eval_linf.pdf')
+plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/eps_iter_eval_linf.pdf')
 plt.show()
