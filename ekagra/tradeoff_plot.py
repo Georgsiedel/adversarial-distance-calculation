@@ -37,5 +37,5 @@ ax2.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 
 # Use tight layout to fit the subplots to the figure area.
 plt.tight_layout()
-plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/eps_iter_eval_linf.pdf')
+# plt.savefig(f'/home/ekagra/Desktop/Study/IMECE/visualization/eps_iter_eval_linf.pdf')
 plt.show()

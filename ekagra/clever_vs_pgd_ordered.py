@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.lines as mlines
 
 """Please change the path"""
 file_path = '/home/ekagra/Desktop/Study/IMECE/visualization/corruption-testing/results/CIFAR10/WideResNet_28_4/Clever vs. PGD-paperversion/config9_standard_eps_0.0_False_run_0_adversarial_distances.csv'
@@ -35,20 +36,24 @@ plt.figure(figsize=(4.69, 2.17))
 plt.scatter(indices, min_adv_dist, alpha=0.7, label=labels, s=2, c=color_adv)
 plt.scatter(indices, clever_score_linf, alpha=0.7, label=labels, s=2, c=colors)
 
-# Customize the legend [TBD]
-# plt.legend(handles=[
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Adversarial Distance (PGD)'),
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=10, label='Adversarial Distance (Second attack)'),
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Clever Score $\geq$ Adversarial Distance'),
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='black', markersize=10, label='Clever Score $<$ Adversarial Distance')
-# ], fontsize=6, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=3)
+# Create and save the legend as a separate image
+markersize = 20
 
-# plt.legend(handles=[
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Adversarial Distance (PGD)'),
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='orange', markersize=10, label='Adversarial Distance (Second attack)'),
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Clever Score $\geq$ Adversarial Distance'),
-#     plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='black', markersize=10, label='Clever Score $<$ Adversarial Distance')
-# ], fontsize=10)
+legend_elements = [
+    mlines.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=markersize, label='Adversarial Distance (PGD)'),
+    mlines.Line2D([0], [0], marker='o', color='w', markerfacecolor='green', markersize=markersize, label='Adversarial Distance (Second attack)'),
+    mlines.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=markersize, label='Clever Score $\geq$ Adversarial Distance'),
+    mlines.Line2D([0], [0], marker='o', color='w', markerfacecolor='black', markersize=markersize, label='Clever Score $<$ Adversarial Distance')
+]
+
+fig_legend = plt.figure(figsize=(4.69, 2.17))
+ax_legend = fig_legend.add_subplot(111)
+ax_legend.legend(handles=legend_elements, loc='center', ncol=4, frameon=False, fontsize=40)
+ax_legend.axis('off')
+
+fig_legend.savefig('/home/ekagra/Desktop/Study/IMECE/visualization/adversarial-distance-estimation/ekagra/legend.pdf', bbox_inches='tight', pad_inches=0.1)
+plt.close(fig_legend)
+
 
 plt.xlabel('Image ID', fontsize=14)
 plt.ylabel('L$_1$ Distance', fontsize=14)
