@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.init as init
 import torch.nn.functional as F
 import numpy as np
-from experiments.models import ct_model
+from models.experiments import ct_model
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=True)

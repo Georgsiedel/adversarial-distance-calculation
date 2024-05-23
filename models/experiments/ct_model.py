@@ -1,9 +1,9 @@
-from experiments.utils import plot_images
+from models.experiments.utils import plot_images
 import torch.nn as nn
 import numpy as np
-from experiments.mixup import mixup_process
-from experiments.noise import apply_noise, noise_up, apply_noise_add_and_mult
-from experiments.data import normalization_values
+from models.experiments.mixup import mixup_process
+from models.experiments.noise import apply_noise, noise_up, apply_noise_add_and_mult
+from models.experiments.data import normalization_values
 
 class CtModel(nn.Module):
 
