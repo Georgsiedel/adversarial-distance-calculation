@@ -1,12 +1,59 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import torch.nn as nn
 import torch.nn.init as init
 import torch.nn.functional as F
 import numpy as np
-from models.experiments import ct_model
+import torch
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def normalization_values(batch, dataset, normalized, manifold=False, manifold_factor=1):
+
+    if manifold:
+        mean = torch.mean(batch, dim=(0, 2, 3), keepdim=True).to(device)
+        std = torch.std(batch, dim=(0, 2, 3), keepdim=True).to(device)
+        mean = mean.view(1, batch.size(1), 1, 1)
+        std = ((1 / std) / manifold_factor).view(1, batch.size(1), 1, 1)
+    elif normalized:
+        if dataset == 'CIFAR10':
+            mean = torch.tensor([0.4914, 0.4822, 0.4465]).view(1, 3, 1, 1).to(device)
+            std = torch.tensor([0.247, 0.243, 0.261]).view(1, 3, 1, 1).to(device)
+        elif dataset == 'CIFAR100':
+            mean = torch.tensor([0.50707516, 0.48654887, 0.44091784]).view(1, 3, 1, 1).to(device)
+            std = torch.tensor([0.26733429, 0.25643846, 0.27615047]).view(1, 3, 1, 1).to(device)
+        elif (dataset == 'ImageNet' or dataset == 'TinyImageNet'):
+            mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1).to(device)
+            std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1).to(device)
+        else:
+            print('no normalization values set for this dataset')
+    else:
+        mean = 0
+        std = 1
+
+    return mean, std
+
+class CtModel(nn.Module):
+
+    def __init__(self, dataset, normalized, num_classes):
+        super(CtModel, self).__init__()
+        self.normalized = normalized
+        self.num_classes = num_classes
+        self.dataset = dataset
+        if normalized:
+            mean, std = normalization_values(batch=None, dataset=dataset, normalized=normalized, manifold=False, manifold_factor=1)
+            self.register_buffer('mu', mean)
+            self.register_buffer('sigma', std)
+
+    def forward_normalize(self, x):
+        if self.normalized:
+            x = (x - self.mu) / self.sigma
+        return x
+
+    def forward_noise_mixup(self, out, targets):
+
+        out = self.blocks[0](out)
+
+        for i, ResidualBlock in enumerate(self.blocks[1:]):
+            out = ResidualBlock(out)
+        return out, targets
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=True)
@@ -74,7 +121,7 @@ class Bottleneck(nn.Module):
         out = self.activation_function(out)
         return out
 
-class WideResNet(ct_model.CtModel):
+class WideResNet(CtModel):
     activation_function: object
 
     def __init__(self, depth, widen_factor, dataset, normalized, dropout_rate=0.0, num_classes=10,
@@ -107,44 +154,16 @@ class WideResNet(ct_model.CtModel):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x, targets=None, robust_samples=0, corruptions=None, mixup_alpha=0.0, mixup_p=0.0, manifold=False,
-                manifold_noise_factor=1, cutmix_alpha=0.0, cutmix_p=0.0, noise_minibatchsize=1,
-                concurrent_combinations=1, noise_sparsity=0.0, noise_patch_lower_scale = 1.0):
+    def forward(self, x, targets=None):
 
         out = super(WideResNet, self).forward_normalize(x)
-        out, mixed_targets = super(WideResNet, self).forward_noise_mixup(out, targets, robust_samples, corruptions,
-                                        mixup_alpha, mixup_p, manifold, manifold_noise_factor, cutmix_alpha, cutmix_p,
-                                        noise_minibatchsize, concurrent_combinations, noise_sparsity,
-                                        noise_patch_lower_scale)
+        out, mixed_targets = super(WideResNet, self).forward_noise_mixup(out, targets)
         out = self.activation_function(self.bn1(out))
         out = F.avg_pool2d(out, 8)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
-        if self.training == True:
-            return out, mixed_targets
-        else:
-            return out
+        return out
 
-def WideResNet_28_2(num_classes, factor, dataset, normalized, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
-    return WideResNet(depth=28, widen_factor=2, dataset=dataset, normalized=normalized, dropout_rate=dropout_rate,
-                      num_classes=num_classes, factor=factor, block=block, activation_function=activation_function)
-
-def WideResNet_28_4(num_classes, factor, dataset, normalized, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
+def WideResNet_28_4(num_classes, dataset, normalized, factor=1, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
     return WideResNet(depth=28, widen_factor=4, dataset=dataset, normalized=normalized, dropout_rate=dropout_rate,
-                      num_classes=num_classes, factor=factor, block=block, activation_function=activation_function)
-
-def WideResNet_28_10(num_classes, factor, dataset, normalized, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
-    return WideResNet(depth=28, widen_factor=10, dataset=dataset, normalized=normalized, dropout_rate=dropout_rate,
-                      num_classes=num_classes, factor=factor, block=block, activation_function=activation_function)
-
-def WideResNet_28_12(num_classes, factor, dataset, normalized, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
-    return WideResNet(depth=28, widen_factor=12, dataset=dataset, normalized=normalized, dropout_rate=dropout_rate,
-                      num_classes=num_classes, factor=factor, block=block, activation_function=activation_function)
-
-def WideResNet_40_10(num_classes, factor, dataset, normalized, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
-    return WideResNet(depth=40, widen_factor=10, dataset=dataset, normalized=normalized, dropout_rate=dropout_rate,
-                      num_classes=num_classes, factor=factor, block=block, activation_function=activation_function)
-
-def WideResNet_70_16(num_classes, factor, dataset, normalized, block=WideBasic, dropout_rate=0.0, activation_function='relu'):
-    return WideResNet(depth=70, widen_factor=16, dataset=dataset, normalized=normalized, dropout_rate=dropout_rate,
                       num_classes=num_classes, factor=factor, block=block, activation_function=activation_function)
