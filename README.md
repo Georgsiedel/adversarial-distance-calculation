@@ -1,3 +1,5 @@
 # adversarial-distance-calculation
 
+This is the code for the paper "A practical approach to evaluating the adversarial distance for machine learning classifiers" published in Proceedings of the ASME 2024International Mechanical Engineering Congress and Exposition. A preprint as accepted can be found here: https://www.researchgate.net/publication/383792352_A_practical_approach_to_evaluating_the_adversarial_distance_for_machine_learning_classifiers
+
 This research evaluates the robustness of machine learning classifiers to adversarial attacks, focusing on two metrics: Adversarial Distance and CLEVER Score. Using iterative adversarial attacks and a certification approach, the study computes the upper and lower bounds of adversarial distances for image classification models. Key findings show that the corruption-trained robust models demonstrate higher resilience compared to standard models, with the CLEVER Score serving as a lower bound and the Adversarial Distance metric as an upper bound for perturbation magnitudes. This research provides a comprehensive framework for assessing the robustness of neural network classifiers in adversarial scenarios.
